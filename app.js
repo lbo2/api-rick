@@ -74,28 +74,32 @@ app.post('/user/login', function (req, res, next) {
 app.post('/getdata', (req, res, next) => {
     var token = req.body.token;
 
-    appDao.get_token(token, function (response, code) {
-        if(Number(response.data.expire) < Date.now()) {
-            response = {err: true, response: "session not valid"}
-            resp(res, response, code, next);
-        } else {
-            var expire = { expire: Date.now() + (2 * 60 * 1000)};
-            appDao.update_session(token, expire, function (response, code) {})
-            appDao.get_user_morty(function (response, code) {
-                var data = [];
-                if(code == 200) {
-                    response.data.results.forEach(character => {
-                        data.push({
-                            name: character.name,
-                            status: character.status,
-                            species: character.species,
-                            gender: character.gender,
-                            image: character.image
-                        })
-                    });
-                }
-                resp(res, data, code, next)
-            })
-        }
-    })
+    if(token == null) {
+        resp(res, {err: true, response: "Invalid session", data: null}, 400, next);
+    } else {
+        appDao.get_token(token, function (response, code) {
+            if(Number(response.data.expire) < Date.now()) {
+                response = {err: true, response: "session expired"}
+                resp(res, response, code, next);
+            } else {
+                var expire = { expire: Date.now() + (2 * 60 * 1000)};
+                appDao.update_session(token, expire, function (response, code) {})
+                appDao.get_user_morty(function (response, code) {
+                    var data = [];
+                    if(code == 200) {
+                        response.data.results.forEach(character => {
+                            data.push({
+                                name: character.name,
+                                status: character.status,
+                                species: character.species,
+                                gender: character.gender,
+                                image: character.image
+                            })
+                        });
+                    }
+                    resp(res, data, code, next)
+                })
+            }
+        })
+    }
 });
