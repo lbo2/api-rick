@@ -9,8 +9,8 @@
   "author": "Jose Montero",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.18.2",
-    "express": "^4.16.2",
+    "body-parser": "^1.20.1",
+    "express": "^4.18.2",
     "redis": "^2.8.0",
     "request": "^2.88.0"
   }
